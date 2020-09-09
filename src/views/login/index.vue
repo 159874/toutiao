@@ -22,6 +22,13 @@
       >
         <i slot="left-icon" class="toutiao toutiao-yanzhengma"></i>
         <template #button>
+          <van-count-down
+            v-if="isCountDownShow"
+            slot="button"
+            :time="1000 * 5"
+            format="ss s"
+            @finish="isCountDownShow = false"
+          />
           <van-button
             native-type="button"
             class="send-sms-btn"
@@ -44,7 +51,7 @@
 </template>
 
 <script>
-import { login } from '@/api/user.js'
+import { login, getSmsCode } from '@/api/user.js'
 export default {
   name: 'loginPage',
   data() {
@@ -53,6 +60,7 @@ export default {
         mobile: '13911111111',
         code: '246810'
       },
+      isCountDownShow: false,
       userFormRules: {
         mobile: [
           {
@@ -106,10 +114,21 @@ export default {
     async onSendSms() {
       // 验证手机号
       try {
-        await this.$refs.loginForm.validate('moblie')
-        this.$toast.success('111')
+        await this.$refs.loginForm.validate('mobile')
       } catch (err) {
         return this.$toast.fail('验证失败', err)
+      }
+      this.isCountDownShow = true
+      try {
+        const res = await getSmsCode(this.user.mobile)
+        console.log(res.data)
+        this.$toast.success('发送成功', res)
+      } catch (error) {
+        if (error.response.status === 429) {
+          this.$toast.fail('发送太频繁了，请稍后重试')
+        } else {
+          this.$toast.fail('发送失败，请稍后重试')
+        }
       }
     }
   }
