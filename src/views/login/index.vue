@@ -1,6 +1,8 @@
 <template>
   <div class="login-container">
-    <van-nav-bar class="page-nav-bar" title="登陆"></van-nav-bar>
+    <van-nav-bar class="page-nav-bar" title="登陆">
+       <van-icon slot="left" class="toutiao toutiao-guanbi" @click="$router.back()" />
+    </van-nav-bar>
     <van-form @submit="onSubmit" ref="loginForm">
       <van-field
         v-model="user.mobile"
@@ -25,11 +27,12 @@
           <van-count-down
             v-if="isCountDownShow"
             slot="button"
-            :time="1000 * 5"
+            :time="1000 * 60"
             format="ss s"
             @finish="isCountDownShow = false"
           />
           <van-button
+            v-else
             native-type="button"
             class="send-sms-btn"
             size="small"
@@ -90,23 +93,19 @@ export default {
       this.$toast.loading({
         message: '登录中...',
         forbidClick: true, // 禁用背景点击
-        duration: 5000 // 持续时间，默认 2000，0 表示持续展示不关闭
+        duration: 0 // 持续时间，默认 2000，0 表示持续展示不关闭
       })
       const s = await login(this.user)
       console.log(s)
       try {
         const { data: res } = await login(this.user)
-        // console.log(res.data)
-        // localStorage.setItem('token', res.data.token)
-        this.$store.token = res.data.token
+        this.$store.commit('setUser', res.data)
         this.$toast.success('登录成功')
-        // console.log('登录成功', res)
+        this.$router.push('/my')
       } catch (err) {
         if (err.response.status === 400) {
-          // console.log('手机号或验证码错误')
           this.$toast.fail('手机号或验证码错误')
         } else {
-          // console.log('登录失败', err)
           this.$toast.fail('登录失败', err)
         }
       }
@@ -120,10 +119,10 @@ export default {
       }
       this.isCountDownShow = true
       try {
-        const res = await getSmsCode(this.user.mobile)
-        console.log(res.data)
-        this.$toast.success('发送成功', res)
+        await getSmsCode(this.user.mobile)
+        this.$toast.success('发送成功')
       } catch (error) {
+        this.isCountDownShow = false
         if (error.response.status === 429) {
           this.$toast.fail('发送太频繁了，请稍后重试')
         } else {
