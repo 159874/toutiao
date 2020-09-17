@@ -17,7 +17,7 @@
       </van-tabbar-item>
       <van-tabbar-item to="/my">
         <i slot="icon" class="toutiao toutiao-wode"></i>
-        <span class="text">我的</span>
+        <span class="text">{{ $store.state.user ? '我的' : '未登录' }}</span>
       </van-tabbar-item>
     </van-tabbar>
   </div>
@@ -31,6 +31,7 @@ export default {
 
 <style lang="less" scoped>
 .layout-container {
+  padding-bottom: 100px;
   .layout-tabbar {
     i.toutiao {
       font-size: 40px;

@@ -10,6 +10,8 @@ import './plugins/vant'
 // rem适配
 import 'amfe-flexible'
 
+import './utils/dayjs'
+
 Vue.config.productionTip = false
 
 new Vue({

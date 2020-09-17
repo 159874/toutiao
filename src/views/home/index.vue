@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <div class="page-nav-bar header">
+    <van-nav-bar class="page-nav-bar header" fixed>
       <van-button
         class="search-btn"
         slot="title"
@@ -8,42 +8,90 @@
         size="small"
         round
         icon="search"
+        to='/search'
         >搜索</van-button
       >
-    </div>
+    </van-nav-bar>
     <van-tabs v-model="active" class="channel-tabs" animated swipeable>
       <van-tab v-for="item in channels" :key="item.id" :title="item.name">
-        {{ item.name }}
-        <router-view/>
+        <article-list :channel="item" />
       </van-tab>
       <div slot="nav-right" class="placeholder"></div>
       <div slot="nav-right" class="hamburger-btn">
-        <i class="toutiao toutiao-gengduo"></i>
+        <i
+          class="toutiao toutiao-gengduo"
+          @click="isChannelEditShow = true"
+        ></i>
       </div>
     </van-tabs>
+    <!-- 弹出框 -->
+    <van-popup
+      class="edit-channel-popup"
+      v-model="isChannelEditShow"
+      position="bottom"
+      :style="{ height: '100%' }"
+      closeable
+      close-icon-position="top-left"
+    >
+      <channel-edit
+        :myChannels="channels"
+        :active="active"
+        @update-active="onUpdateActive"
+        @add-channel="onAddChannel"
+        @channel-click="deleteChannelClick"
+      ></channel-edit>
+    </van-popup>
   </div>
 </template>
 
 <script>
 import { getUserChannels } from '@/api/user'
+import ArticleList from './components/article-list'
+import ChannelEdit from './components/channel-edit'
+import { mapState } from 'vuex'
+import { getItem } from '@/utils/storage'
 export default {
   data() {
     return {
       active: 0,
-      channels: []
+      channels: [],
+      isChannelEditShow: false
     }
+  },
+  components: {
+    'article-list': ArticleList,
+    'channel-edit': ChannelEdit
   },
   created() {
     this.loadChannels()
   },
+  computed: {
+    ...mapState(['user'])
+  },
   methods: {
     async loadChannels() {
       try {
-        const { data: res } = await getUserChannels()
-        this.channels = res.data.channels
+        const localChannel = getItem('TOUTIAO_CHANNELS')
+        if (this.user || !localChannel) {
+          const { data: res } = await getUserChannels()
+          this.channels = res.data.channels
+          return false
+        } else {
+          this.channels = localChannel
+        }
       } catch (error) {
         this.$toast.fail('获取频道列表失败')
       }
+    },
+    onUpdateActive(index, isEditChannelShow) {
+      this.active = index
+      this.isChannelEditShow = isEditChannelShow
+    },
+    onAddChannel(value) {
+      this.channels.push(value)
+    },
+    deleteChannelClick(index, num) {
+      this.channels.splice(index, num)
     }
   }
 }
@@ -51,6 +99,7 @@ export default {
 
 <style lang="less" scoped>
 .home-container {
+  padding-top: 180px;
   /deep/.van-nav-bar__title {
     max-width: unset;
   }
@@ -107,6 +156,16 @@ export default {
         font-size: 33px;
       }
     }
+    .van-tabs__wrap {
+      position: fixed;
+      top: 92px;
+      z-index: 2;
+      width: 100%;
+    }
   }
+}
+.edit-channel-popup {
+  padding-top: 100px;
+  box-sizing: border-box;
 }
 </style>

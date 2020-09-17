@@ -4,34 +4,31 @@
     <div v-if="user" class="header user-info">
       <div class="base-info">
         <div class="left">
-          <van-image
-            fit="cover"
-            round
-            class="avatar"
-            :src="userInfo.photo"
-          />
-          <span class="name">{{userInfo.name}}</span>
+          <van-image fit="cover" round class="avatar" :src="userInfo.photo" />
+          <span class="name">{{ userInfo.name }}</span>
         </div>
         <div class="right">
-          <van-button type="default" size="mini" round>编辑资料</van-button>
+          <van-button type="default" size="mini" round to="/user/profile"
+            >编辑资料</van-button
+          >
         </div>
       </div>
       <!-- 粉丝 关注 -->
       <div class="data-stats">
         <div class="data-item">
-          <span>{{userInfo.art_count}}</span>
+          <span>{{ userInfo.art_count }}</span>
           <span>头条</span>
         </div>
         <div class="data-item">
-          <span>{{userInfo.follow_count}}</span>
+          <span>{{ userInfo.follow_count }}</span>
           <span>关注</span>
         </div>
         <div class="data-item">
-          <span>{{userInfo.fans_count}}</span>
+          <span>{{ userInfo.fans_count }}</span>
           <span>粉丝</span>
         </div>
         <div class="data-item">
-          <span>{{userInfo.like_count}}</span>
+          <span>{{ userInfo.like_count }}</span>
           <span>获赞</span>
         </div>
       </div>
@@ -186,7 +183,6 @@ export default {
       }
     }
   }
-
   .van-grid {
     background: #fff;
     .toutiao {
