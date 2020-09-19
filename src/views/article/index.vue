@@ -62,7 +62,36 @@
           ref="article-content"
         ></div>
         <van-divider>正文结束</van-divider>
-        <article-commect />
+        <article-commect
+          :list="commentList"
+          :source="article.art_id"
+          @onload-success="totalCount = $event"
+          @click-reply="onReplyClick"
+        />
+
+        <!-- 底部区域 -->
+        <div class="article-bottom">
+          <van-button
+            class="comment-btn"
+            type="default"
+            round
+            size="small"
+            @click="isPostShow = true"
+          >
+            写评论
+          </van-button>
+          <van-icon name="comment-o" :info="totalCount" color="#777" />
+          <!-- <article-commect /> -->
+          <collect-article
+            v-model="article.is_collected"
+            :article-id="article.art_id"
+          />
+          <like-article
+            v-model="article.attitude"
+            :article-id="article.art_id"
+          />
+          <van-icon name="share" color="#777777"></van-icon>
+        </div>
       </div>
 
       <!-- 加载失败 404 -->
@@ -80,21 +109,18 @@
         >
       </div>
     </div>
-
-    <!-- 底部区域 -->
-    <div class="article-bottom">
-      <van-button class="comment-btn" type="default" round size="small">
-        写评论
-      </van-button>
-      <van-icon name="comment-o" info="123" color="#777" />
-      <!-- <article-commect /> -->
-      <collect-article
-        v-model="article.is_collected"
-        :article-id="article.art_id"
+    <van-popup v-model="isPostShow" position="bottom">
+      <comment-post @onpost-success="onPostSuccess" :target="article.art_id" />
+    </van-popup>
+    <!-- 评论回复 -->
+    <van-popup v-model="isReplyShow" position="bottom" style="height: 70%">
+      <comment-reply
+        v-if="isReplyShow"
+        :comment="currentComment"
+        @close="isReplyShow = false"
       />
-      <like-article v-model="article.attitude" :article-id="article.art_id" />
-      <van-icon name="share" color="#777777"></van-icon>
-    </div>
+    </van-popup>
+    <!-- /评论回复 -->
   </div>
 </template>
 
@@ -104,6 +130,8 @@ import FollowUser from '@/components/follow-user'
 import CollectArticle from '@/components/collect-article'
 import LikeArticle from '@/components/like-article'
 import ArticleComment from './components/article-commect'
+import CommentPost from './components/comment-post'
+import CommentReply from './components/comment-reply'
 import { ImagePreview } from 'vant'
 
 export default {
@@ -114,18 +142,30 @@ export default {
       required: true
     }
   },
+  provide: function () {
+    return {
+      articleId: this.articleId
+    }
+  },
   components: {
     'follow-user': FollowUser,
     'collect-article': CollectArticle,
     'like-article': LikeArticle,
-    'article-commect': ArticleComment
+    'article-commect': ArticleComment,
+    'comment-post': CommentPost,
+    'comment-reply': CommentReply
   },
   data() {
     return {
       article: {},
       isLoading: false,
       errStatus: 0,
-      isFollowLoading: false
+      isFollowLoading: false,
+      totalCount: 0,
+      isPostShow: false,
+      commentList: [],
+      isReplyShow: false,
+      currentComment: {}
     }
   },
 
@@ -161,6 +201,16 @@ export default {
           })
         }
       })
+    },
+    onPostSuccess(res) {
+      console.log(res)
+      this.commentList.unshift(res.data.new_obj)
+      this.isPostShow = false
+    },
+    onReplyClick(comment) {
+      this.currentComment = comment
+      // 显示评论回复弹出层
+      this.isReplyShow = true
     }
   }
 }
