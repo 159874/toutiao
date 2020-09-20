@@ -1,16 +1,17 @@
 <template>
   <div class="update-avatar">
     <img :src="img" class="img" ref="img" />
+
     <div class="toolbar">
-      <span @click="$emit('close')">取消</span>
-      <span @click="confirm">完成</span>
+      <span class="cancel" @click="$emit('close')">取消</span>
+      <span class="confirm" @click="confirm">完成</span>
     </div>
   </div>
 </template>
 
 <script>
 import { updateUserAvatar } from '@/api/user'
-import 'cropperjs/dist/cropper.js'
+import 'cropperjs/dist/cropper.css'
 import Cropper from 'cropperjs'
 export default {
   data() {
@@ -30,7 +31,7 @@ export default {
       viewMode: 1,
       dragMode: 'move',
       aspectRatio: 1,
-      autoCropArea: 1,
+      // autoCropArea: 1,
       cropBoxMovable: false,
       cropBoxResizable: false,
       background: false
@@ -66,19 +67,29 @@ export default {
 
 <style lang="less" scoped>
 .update-avatar {
-  background: #000;
-  width: 100%;
+  background-color: #000;
   height: 100%;
   .toolbar {
     position: fixed;
-    bottom: 10px;
-    width: 100%;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     justify-content: space-between;
-    font-size: 28px;
-    color: #fff;
-    padding: 0 15px;
-    box-sizing: border-box;
+    .cancel,
+    .confirm {
+      width: 90px;
+      height: 90px;
+      font-size: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
   }
+}
+.img {
+  display: block;
+  max-width: 100%;
 }
 </style>

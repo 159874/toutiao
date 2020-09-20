@@ -8,6 +8,7 @@
       :error.sync="err"
       error-text="加载失败 点击重试"
       @load="onLoad"
+      :immediate-check="false"
     >
       <!-- <van-cell v-for="(item, index) in list" :key="index">
         <van-image

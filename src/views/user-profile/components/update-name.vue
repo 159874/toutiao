@@ -16,7 +16,7 @@
         autosize
         type="textarea"
         show-word-limit
-        maxlength="50"
+        maxlength="7"
       />
     </div>
   </div>
